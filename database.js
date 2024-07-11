@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-mongoose.connect(`${process.env.MONGODB_ATLAS}`, {
+mongoose.connect(`${process.env.MONGODB_LOKAL}`, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });

@@ -132,7 +132,7 @@ const ubahRoleUser = async (req, res) => {
     if (!cekUser) {
       throw new Error("id not found");
     }
-    if (req.body.role > 3 || req.body.role < 1) {
+    if (req.body.role > 5 || req.body.role < 1) {
       throw new Error("User role not allowed");
     }
     const roleUpdated = await User.updateOne(
