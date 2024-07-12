@@ -1,5 +1,6 @@
 const bookRoutes = require("express").Router();
 const {
+  searchBooking,
   getAllSemuaBooking,
   deleteBooking,
   updateBooking,
@@ -31,6 +32,7 @@ bookRoutes.put("/booking/ubah/:id", verifyToken, verifyRole2, updateBooking);
 bookRoutes.delete("/books/hapus/:id", verifyToken, verifyRole2, deleteBook);
 bookRoutes.delete("/booking/hapus/:id",verifyToken, deleteBooking);
 bookRoutes.get("/books/search", verifyToken, searchBook);
+bookRoutes.get("/boooking/search", verifyToken, searchBooking);
 
 // bookRoutes.post("/addchat", createChat);
 // bookRoutes.get("/:userId", findUserChats);

@@ -109,6 +109,25 @@ const deleteBooking = async (req, res) => {
   }
 };
 
+const searchBooking = async (req, res) => {
+  try {
+    if (!req.query.nama) {
+      return res.status(400).json({ message: "Wrong Query", status: 400 });
+    }
+    const result = await Book.find({
+      nama: { $regex: req.query.nama, $options: "i" },
+    });
+    // if (result.length === 0) {
+    //   throw new Error("nama buku tidak ada");
+    // }
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({
+      message: err.message,
+    });
+  }
+};
+
 const searchBook = async (req, res) => {
   try {
     if (!req.query.namaBuku) {
@@ -228,6 +247,7 @@ const reqError = (req, res) => {
 };
 
 module.exports = {
+  searchBooking,
   getAllSemuaBooking,
   deleteBooking,
   updateBooking,
