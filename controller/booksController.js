@@ -1,5 +1,6 @@
 const Book = require("../models/booking");
 const mongoose = require('mongoose');
+const nodemailer = require('nodemailer');
 
 
 const getAllBooks = async (req, res) => {
@@ -166,27 +167,81 @@ const getBookById = async (req, res) => {
 };
 
 const addBooks = async (req, res) => {
-  const { nama, namaPsikolog, tglBooking, layanan, tglKonseling, harga } = req.body;
+  const { nama, namaPsikolog, tglBooking, layanan, tglKonseling, harga, userEmail, psikologEmail } = req.body;
 
   try {
-    // Buat objek buku baru
+    // Buat objek booking baru, termasuk menyimpan email pengguna dan psikolog
     const newBook = new Book({
       nama,
-      namaPsikolog, // Menyimpan nama psikolog langsung
+      namaPsikolog,
       tglBooking,
       layanan,
       tglKonseling,
       harga,
+      userEmail, // Menyimpan email pengguna
+      psikologEmail, // Menyimpan email psikolog
     });
 
-    // Simpan buku ke database
+    // Simpan booking ke database
     const addBook = await newBook.save();
 
-    res.status(201).json({ addBook, message: 'Berhasil Booking' });
+    // Atur konfigurasi transporter untuk Nodemailer
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'nurwahyuuningtiasih@gmail.com', // Gunakan environment variable
+        pass: 'nodw xbxe poga woma', // Gunakan environment variable
+      },
+    });
+
+    // Konfigurasi email yang akan dikirim ke pengguna yang sedang login
+    const userMailOptions = {
+      from: 'nurwahyuuningtiasih@gmail.com',
+      to: userEmail, // Email pengguna yang sedang login
+      subject: 'Konfirmasi Booking Konseling',
+      text: `Halo ${nama},\n\nBooking kamu dengan Psikolog ${namaPsikolog} pada tanggal ${tglKonseling} telah berhasil.\n\nTerima kasih telah menggunakan layanan kami.\n\nSalam,\nTim Konseling`,
+    };
+
+    // Konfigurasi email yang akan dikirim ke psikolog berdasarkan paket
+    const psikologMailOptions = {
+      from: 'nurwahyuuningtiasih@gmail.com',
+      to: psikologEmail, // Email psikolog berdasarkan paket yang dipilih
+      subject: 'Booking Baru untuk Konseling',
+      text: `Halo ${namaPsikolog},\n\nAda booking baru untuk layanan konseling pada tanggal ${tglKonseling}.\n\nDetail Booking:\n- Nama Klien: ${nama}\n- Layanan: ${layanan}\n- Harga: ${harga}\n\nSilakan persiapkan konseling.\n\nSalam,\nTim Konseling`,
+    };
+
+    // Kirim email ke pengguna dan psikolog
+    await transporter.sendMail(userMailOptions);
+    await transporter.sendMail(psikologMailOptions);
+
+    res.status(201).json({ addBook, message: 'Berhasil Booking dan email telah dikirim ke kedua penerima' });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
+
+// const addBooks = async (req, res) => {
+//   const { nama, namaPsikolog, tglBooking, layanan, tglKonseling, harga } = req.body;
+
+//   try {
+//     // Buat objek buku baru
+//     const newBook = new Book({
+//       nama,
+//       namaPsikolog, // Menyimpan nama psikolog langsung
+//       tglBooking,
+//       layanan,
+//       tglKonseling,
+//       harga,
+//     });
+
+//     // Simpan buku ke database
+//     const addBook = await newBook.save();
+
+//     res.status(201).json({ addBook, message: 'Berhasil Booking' });
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// };
 
 
 const updateBook = async (req, res) => {
