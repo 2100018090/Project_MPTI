@@ -1,4 +1,7 @@
-const emailValidator = require("email-validator");
+const emailValidator = require('email-validator');
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+const VerificationToken = require("../models/VerificationToken");
 const Psikolog = require("../models/psikolog");
 const User = require("../models/users");
 const Token = require("../models/token");
@@ -80,21 +83,82 @@ const addUser = async (req, res) => {
     email: req.body.email,
     password: await hashPassword(req.body.password),
     role: 5,
+    isVerified: false,
   });
+
   try {
     const duplikat = await User.findOne({ email: user.email });
     if (duplikat) {
-      throw new Error("email sudah digunakan");
+      throw new Error('Email sudah digunakan');
     }
-    if (emailValidator.validate(user.email) === false) {
-      throw new Error("email not valid");
+
+    if (!emailValidator.validate(user.email)) {
+      throw new Error('Email tidak valid');
     }
-    const addUser = await user.save();
-    res.status(201).json({ addUser, message: "Registrasi Berhasil" });
+
+    const savedUser = await user.save();
+
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationData = new VerificationToken({
+      userId: savedUser._id,
+      token: verificationToken,
+      createdAt: Date.now(),
+    });
+    await verificationData.save();
+
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'nurwahyuuningtiasih@gmail.com',
+        pass: 'nodw xbxe poga woma',
+      },
+    });
+
+    const mailOptions = {
+      from: 'nurwahyuuningtiasih@gmail.com',
+      to: user.email,
+      subject: 'Verifikasi Email',
+      html: `<h2>Verifikasi Email</h2>
+             <p>Terima kasih ${user.nama} telah mendaftar. Silakan login menggunakan email Anda dengan mengklik tautan di bawah ini:</p>
+             <a href="https://logia-project.et.r.appspot.com/login">Web Logia</a>`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error mengirim email:', error);
+        return res.status(500).json({ message: 'Gagal mengirim email', error });
+      }
+      console.log('Email terkirim:', info.response);
+      res.status(201).json({
+        message: 'Registrasi berhasil. Silakan cek email untuk verifikasi.',
+      });
+    });
   } catch (err) {
     res.status(400).json({ message: err.message, status: 400 });
   }
 };
+
+// const addUser = async (req, res) => {
+//   const user = new User({
+//     nama: req.body.nama,
+//     email: req.body.email,
+//     password: await hashPassword(req.body.password),
+//     role: 5,
+//   });
+//   try {
+//     const duplikat = await User.findOne({ email: user.email });
+//     if (duplikat) {
+//       throw new Error("email sudah digunakan");
+//     }
+//     if (emailValidator.validate(user.email) === false) {
+//       throw new Error("email not valid");
+//     }
+//     const addUser = await user.save();
+//     res.status(201).json({ addUser, message: "Registrasi Berhasil" });
+//   } catch (err) {
+//     res.status(400).json({ message: err.message, status: 400 });
+//   }
+// };
 
 const addPsikolog = async (req, res) => {
   const psikolog = new Psikolog({

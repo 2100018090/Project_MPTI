@@ -5,7 +5,7 @@ const userRoutes = require("./routes/userRoutes");
 // const chatRoutes = require("./routes/chatRoutes");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8080;
 
 // dokumnetasi swagger
 const swaggerUI = require("swagger-ui-express");
