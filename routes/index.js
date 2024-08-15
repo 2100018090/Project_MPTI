@@ -1,5 +1,6 @@
 const bookRoutes = require("express").Router();
 const {
+  getContactById,
   getContacts, 
   createContact, 
   updateContact, 
@@ -25,6 +26,7 @@ const { verifyToken, verifyRole2 } = require("../middleware/auth");
 //   findChat
 // } = require("../controller/chatController");
 
+bookRoutes.get("/contacts/:id",getContactById);
 bookRoutes.put("/contacts/:id",updateContact);
 bookRoutes.delete("/contacts/:id",deleteContact);
 bookRoutes.get("/getcontact",getContacts);

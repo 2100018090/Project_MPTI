@@ -15,6 +15,24 @@ const getContacts = async (req, res) => {
   }
 };
 
+// Fungsi untuk mendapatkan kontak berdasarkan ID
+const getContactById = async (req, res) => {
+  try {
+    const contact = await Contact.findOne({ _id: req.params.id });
+    if (!contact) {
+      throw new Error("id not found");
+    }
+    res.status(200).json({
+      contact,
+      message: "Kontak ditemukan",
+    });
+  } catch (err) {
+    res.status(404).json({
+      message: "id not found",
+    });
+  }
+};
+
 // Fungsi untuk menambahkan kontak baru
 const createContact = async (req, res) => {
   const contact = new Contact({
@@ -68,6 +86,7 @@ const deleteContact = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
 
 const getAllBooks = async (req, res) => {
   try {
@@ -368,6 +387,7 @@ const reqError = (req, res) => {
 };
 
 module.exports = {
+  getContactById,
   getContacts, 
   createContact, 
   updateContact, 
