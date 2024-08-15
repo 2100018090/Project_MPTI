@@ -1,7 +1,34 @@
 const Book = require("../models/booking");
+const Contact = require("../models/contact");
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 
+// Fungsi untuk mendapatkan semua kontak
+const getContacts = async (req, res) => {
+  try {
+    const contacts = await Contact.find({}, { email: 1, telp: 1 });
+    res.status(200).json(contacts);
+  } catch (err) {
+    res.status(404).json({
+      message: err.message,
+    });
+  }
+};
+
+// Fungsi untuk menambahkan kontak baru
+const createContact = async (req, res) => {
+  const contact = new Contact({
+    email: req.body.email,
+    telp: req.body.telp,
+  });
+
+  try {
+    const savedContact = await contact.save();
+    res.status(201).json({ savedContact, message: "Kontak berhasil ditambahkan" });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
 
 const getAllBooks = async (req, res) => {
   try {
@@ -302,6 +329,9 @@ const reqError = (req, res) => {
 };
 
 module.exports = {
+  getContacts, 
+  createContact,
+  createContact,
   searchBooking,
   getAllSemuaBooking,
   deleteBooking,
