@@ -1,7 +1,9 @@
 const bookRoutes = require("express").Router();
 const {
-  getContacts,
-  createContact,
+  getContacts, 
+  createContact, 
+  updateContact, 
+  deleteContact,
   searchBooking,
   getAllSemuaBooking,
   deleteBooking,
@@ -23,6 +25,8 @@ const { verifyToken, verifyRole2 } = require("../middleware/auth");
 //   findChat
 // } = require("../controller/chatController");
 
+bookRoutes.put("/contacts/:id",updateContact);
+bookRoutes.delete("/contacts/:id",deleteContact);
 bookRoutes.get("/getcontact",getContacts);
 bookRoutes.post("/tambahcontact",createContact);
 bookRoutes.get("/booking",getAllSemuaBooking);

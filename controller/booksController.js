@@ -30,6 +30,45 @@ const createContact = async (req, res) => {
   }
 };
 
+// Fungsi untuk mengedit kontak yang sudah ada
+const updateContact = async (req, res) => {
+  const { id } = req.params;
+  const { email, telp } = req.body;
+
+  try {
+    const updatedContact = await Contact.findByIdAndUpdate(
+      id,
+      { email, telp },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedContact) {
+      return res.status(404).json({ message: "Kontak tidak ditemukan" });
+    }
+
+    res.status(200).json({ updatedContact, message: "Kontak berhasil diperbarui" });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+// Fungsi untuk menghapus kontak
+const deleteContact = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedContact = await Contact.findByIdAndDelete(id);
+
+    if (!deletedContact) {
+      return res.status(404).json({ message: "Kontak tidak ditemukan" });
+    }
+
+    res.status(200).json({ message: "Kontak berhasil dihapus" });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
 const getAllBooks = async (req, res) => {
   try {
     // const currentPage = parseInt(req.query.page) || 1;
@@ -330,8 +369,9 @@ const reqError = (req, res) => {
 
 module.exports = {
   getContacts, 
-  createContact,
-  createContact,
+  createContact, 
+  updateContact, 
+  deleteContact,
   searchBooking,
   getAllSemuaBooking,
   deleteBooking,
